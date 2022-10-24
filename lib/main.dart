@@ -69,7 +69,7 @@ Widget headimg() {
     child: Image.network("https://umburoff.sirv.com/Images/img_311846.png"), //Imagen de internet
   );
 }
-Widget correo() {
+Widget correo() { 
   return Container(
     //padding horizontal y vertical
     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
