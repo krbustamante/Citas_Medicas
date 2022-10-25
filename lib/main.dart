@@ -1,6 +1,6 @@
 import 'package:citas_medicas/pages/singin.dart';
 import 'package:flutter/material.dart'; //Importamos el material.dart  
-
+import 'package:citas_medicas/pages/lostpassword.dart';
 // Atajo para crear esqueleto: mateapp
 
 void main() {
@@ -32,7 +32,7 @@ class _loginState extends State<login> {
                 headimg(),
                 correo(),
                 password(),
-                passforgot(),
+                passforgot(context),
                 btnlogin(context),
                 registrate(),     
               ],
@@ -124,9 +124,14 @@ Widget btnlogin(context) {
   );
 }
 
-Widget passforgot() {
+Widget passforgot(context) {
   return TextButton( //boton sin estilos
-    onPressed: () {},  
+    onPressed: () => {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context)=>lostpass()))
+      }, //Evento del boton
+
     child: Text("¿Olvidaste tu Contraseña?"),
     style: TextButton.styleFrom(
       primary: Color.fromARGB(255, 18, 4, 150),

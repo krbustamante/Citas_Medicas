@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const MyApp());
+void main() => runApp(const lostpass());
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class lostpass extends StatefulWidget {
+  const lostpass({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<lostpass> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<lostpass> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
