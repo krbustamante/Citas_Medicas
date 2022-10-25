@@ -39,3 +39,22 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
+Widget correo() {
+  return Container(
+    //padding horizontal y vertical
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+    child: Column( //contenedor columna para poner varios widgets consecutivos
+      children: [ //hace una lista de varios widgeta
+        //Campo Correo Electrónico
+        TextField(  //Campo de Texto
+          decoration: InputDecoration( //Dentro podemos poner los estilos del campo
+            prefixIcon: Icon(Icons.email),
+            hintText: "Correo Electrónico", //Texto dentro del campo
+            fillColor: Colors.white, //color del background del campo
+            filled: true, //habilitamos el color
+           ),
+        ),
+    ]),
+  );
+}
