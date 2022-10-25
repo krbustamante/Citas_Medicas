@@ -58,3 +58,18 @@ Widget correo() {
     ]),
   );
 }
+
+Widget btnsendemail() {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 95, vertical: 5),
+    child: ElevatedButton( //Boton con estilos ya establecidos
+      onPressed: () => {
+        
+      }, //Evento del boton
+      child: Text('Enviar'), //Texto del boton
+      style: ElevatedButton.styleFrom( //Definimos estilos
+        backgroundColor: Color.fromARGB(255, 0, 164, 65), //Color del boton
+      ),
+    ),
+  );
+}
