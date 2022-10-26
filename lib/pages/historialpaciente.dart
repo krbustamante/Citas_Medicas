@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(const historial());
 
-class historial extends StatelessWidget {
+class historial extends StatefulWidget {
   const historial({super.key});
 
+  @override
+  State<historial> createState() => _historialState();
+}
+
+class _historialState extends State<historial> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

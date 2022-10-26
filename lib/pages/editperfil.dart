@@ -6,10 +6,10 @@ class perfil extends StatefulWidget {
   const perfil({super.key});
 
   @override
-  State<perfil> createState() => _MyAppState();
+  State<perfil> createState() => _perfilState();
 }
 
-class _MyAppState extends State<perfil> {
+class _perfilState extends State<perfil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,4 +37,24 @@ class _MyAppState extends State<perfil> {
         )
     );
   }
+}
+
+Widget header() {
+  return Container( //centramos el contenido                                      
+    child: ListView( //Creamos un contenedor que va poder hacer scroll
+      children: <Widget> [ 
+        Container(
+          decoration: new BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(40)),
+          ),
+          width: 100,
+          height: 100,
+          child: CircleAvatar(
+            backgroundImage: NetworkImage("https://umburoff.sirv.com/Images/luffy.jpg",),
+          )               
+        ),
+        const Text("krbustamante", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.white),textAlign: TextAlign.center,),
+      ],
+    ),
+    );
 }

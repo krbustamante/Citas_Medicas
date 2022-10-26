@@ -48,23 +48,73 @@ Widget Registrate() {
     textAlign: TextAlign.center,
   );
 }
-
 Widget Nombre() {
-  return TextField(
+  return Container(
+    child: TextField(
       decoration: InputDecoration(
       hintText: "Nombre",
       fillColor: Colors.white,
       filled: true,
       ),
-    );
+    )
+  );
 }
 
 Widget Apellido() {
-  return TextField(
+  return Container(
+    child: TextField(
       decoration: InputDecoration(
       hintText: "Apellido",
       fillColor: Colors.white,
       filled: true,
       ),
-    );
+    ),
+  );
+}
+
+Widget Correo_Electronico() {
+  return Container(
+    child: TextField(
+      decoration: InputDecoration(
+      hintText: "Correo Electronico",
+      fillColor: Colors.white,
+      filled: true,
+      ),
+    ),
+  );
+}
+
+Widget Edad() {
+  return Container(
+    child: TextField(
+      decoration: InputDecoration(
+      hintText: "Edad",
+      fillColor: Colors.white,
+      filled: true,
+      ),
+    ),
+  );
+}
+
+Widget Direccion() {
+  return Container(
+    child: TextField(
+      decoration: InputDecoration(
+      hintText: "Direccion",
+      fillColor: Colors.white,
+      filled: true,
+      ),
+    ),
+  );
+}
+
+Widget Contrasenia() {
+  return Container(
+    child: TextField(
+      decoration: InputDecoration(
+      hintText: "Contraseña",
+      filled: true,
+      ),
+    ),
+  );
 }
