@@ -1,3 +1,4 @@
+import 'package:citas_medicas/pages/lostpassword.dart';
 import 'package:flutter/material.dart';
 
 class singin extends StatefulWidget {
@@ -19,7 +20,12 @@ class _singinState extends State<singin> {
               children: <Widget> [ //creamos una lista que pondra mas widgets uno tras otro
                 Registrate(),
                 Nombre(),
-                Apellido()
+                Apellido(),
+                Correo_Electronico(),
+                Edad(),
+                Direccion(),
+                Contrasenia(),
+                Inicia_Sesion(context)
               ],
             )
             ),
@@ -116,5 +122,28 @@ Widget Contrasenia() {
       filled: true,
       ),
     ),
+  );
+}
+
+
+Widget Inicia_Sesion(context) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text("¿Ya tienes una cuenta?", style: TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.bold)),
+      TextButton(
+        onPressed: () => {
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context)=>singin()))
+        }, //Evento del boton
+        child: Text("Inicia Sesion"),
+        style: TextButton.styleFrom(
+          primary: Color.fromARGB(255, 18, 4, 150),
+          minimumSize: Size.zero, // Set this
+          padding: EdgeInsets.zero, // and this
+        ),
+        ),
+    ],
   );
 }
