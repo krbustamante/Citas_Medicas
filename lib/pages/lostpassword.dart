@@ -1,3 +1,4 @@
+import 'package:citas_medicas/main.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const lostpass());
@@ -12,15 +13,17 @@ class lostpass extends StatefulWidget {
 class _MyAppState extends State<lostpass> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Inicia Sesión",
-      debugShowCheckedModeBanner: false,
-        home: Scaffold(
+    return Scaffold(
+          appBar: AppBar(
+            title: Text("Recupera tu contraseña"),
+          ),
           body: Container( //Creamos un contenedor
             child: Center( //centramos el contenido
               child: ListView( //Creamos un contenedor que va poder hacer scroll
                 children: <Widget> [ //creamos una lista que pondra mas widgets uno tras otro
-                      
+                  head(),
+                  correo(),
+                  btnsendemail(context),
                 ],
               )
               ),
@@ -35,15 +38,22 @@ class _MyAppState extends State<lostpass> {
                     ),
                   ),        
           ),
-        )
     );
   }
+}
+
+Widget head() {
+  return Container(
+    padding: EdgeInsets.fromLTRB(0, 20.0, 0, 0), //Padding con los valores left, top, rigt, button
+    //Con child puedes poner un elemento
+    child: Text("Te enviaremos un correo para que puedas restablecer tu contraseña", style: TextStyle(color: Colors.black, fontSize: 16.0, fontWeight: FontWeight.w400),textAlign: TextAlign.center,),
+  );
 }
 
 Widget correo() {
   return Container(
     //padding horizontal y vertical
-    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+    padding: EdgeInsets.fromLTRB(5.0, 20.0, 5.0, 20.0),
     child: Column( //contenedor columna para poner varios widgets consecutivos
       children: [ //hace una lista de varios widgeta
         //Campo Correo Electrónico
@@ -59,12 +69,26 @@ Widget correo() {
   );
 }
 
-Widget btnsendemail() {
+Widget btnsendemail(context) {
   return Container(
     padding: EdgeInsets.symmetric(horizontal: 95, vertical: 5),
     child: ElevatedButton( //Boton con estilos ya establecidos
       onPressed: () => {
-        
+        showDialog(context: context, builder: (context) => AlertDialog(
+            title: Text("Recupera tu contraseña"),
+            content: Text("Revisa tu correo electrónico y sigue las instrucciones para restablecer tu contraseña."),
+            actions: <Widget>[
+              TextButton(
+                child: Text("Aceptar"),
+                onPressed: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context)=>login()))
+                },
+              ),
+            ],
+          )
+        )
       }, //Evento del boton
       child: Text('Enviar'), //Texto del boton
       style: ElevatedButton.styleFrom( //Definimos estilos
