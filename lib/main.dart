@@ -1,3 +1,4 @@
+import 'package:citas_medicas/pages/historialpaciente.dart';
 import 'package:citas_medicas/pages/singin.dart';
 import 'package:flutter/material.dart'; //Importamos el material.dart  
 import 'package:citas_medicas/pages/lostpassword.dart';
@@ -34,7 +35,7 @@ class _loginState extends State<login> {
                 password(),
                 passforgot(context),
                 btnlogin(context),
-                registrate(),     
+                registrate(context),     
               ],
             )
             ),
@@ -114,7 +115,7 @@ Widget btnlogin(context) {
       onPressed: () => {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context)=>singin()))
+          MaterialPageRoute(builder: (context)=>historial()))
       }, //Evento del boton
       child: Text('Iniciar Sesión'), //Texto del boton
       style: ElevatedButton.styleFrom( //Definimos estilos
@@ -140,13 +141,17 @@ Widget passforgot(context) {
     ),
   );
 }
-Widget registrate() {
+Widget registrate(context) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Text("¿No tienes una cuenta?", style: TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.bold)),
       TextButton(
-        onPressed: () {},
+        onPressed: () => {
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context)=>singin()))
+        }, //Evento del boton
         child: Text("Registrate"),
         style: TextButton.styleFrom(
           primary: Color.fromARGB(255, 18, 4, 150),
