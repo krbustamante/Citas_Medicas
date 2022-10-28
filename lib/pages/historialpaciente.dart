@@ -122,9 +122,7 @@ Widget listado(context) {
       return ListTile(
         title: Text(_citas[index].hora + " " + _citas[index].fecha),
         subtitle: Text(_citas[index].consultorio),
-        leading: CircleAvatar(
-          child: Text(_citas[index].hora.substring(0,1)),
-        ),
+        
         trailing: Icon(Icons.arrow_forward_ios),
       );
     }
