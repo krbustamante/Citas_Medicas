@@ -1,3 +1,4 @@
+import 'package:citas_medicas/pages/historialpaciente.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const perfil());
@@ -27,6 +28,7 @@ class _perfilState extends State<perfil> {
                 Edad(),
                 Direccion(),
                 Contrasenia(),
+                btnsave(context),
               ],
             )
             ),
@@ -46,7 +48,8 @@ class _perfilState extends State<perfil> {
 }
 
 Widget header() {
-  return Container( //centramos el contenido                                      
+  return Container( //centramos el contenido    
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),                                  
     child: ListView( //Creamos un contenedor que va poder hacer scroll
       children: <Widget> [ 
         Container(
@@ -63,10 +66,12 @@ Widget header() {
       ],
     ),
     );
-}
+  }
+
 
 Widget Nombre() {
   return Container(
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
     child: TextField(
       decoration: InputDecoration(
       hintText: "Nombre",
@@ -80,6 +85,7 @@ Widget Nombre() {
 
 Widget Apellido() {
   return Container(
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
     child: TextField(
       decoration: InputDecoration(
       hintText: "Apellido",
@@ -92,6 +98,7 @@ Widget Apellido() {
 
 Widget Correo_Electronico() {
   return Container(
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
     child: TextField(
       decoration: InputDecoration(
       hintText: "Correo Electronico",
@@ -104,6 +111,7 @@ Widget Correo_Electronico() {
 
 Widget Edad() {
   return Container(
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
     child: TextField(
       decoration: InputDecoration(
       hintText: "Edad",
@@ -116,6 +124,7 @@ Widget Edad() {
 
 Widget Direccion() {
   return Container(
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
     child: TextField(
       decoration: InputDecoration(
       hintText: "Direccion",
@@ -129,6 +138,7 @@ Widget Direccion() {
 
 Widget Contrasenia() {
   return Container(
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
     child: TextField(
       decoration: InputDecoration(
       hintText: "Contraseña",
@@ -138,3 +148,19 @@ Widget Contrasenia() {
   );
 }
 
+Widget btnsave(context) {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 95, vertical: 5),
+    child: ElevatedButton( //Boton con estilos ya establecidos
+      onPressed: () => {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context)=>historial()))
+      }, //Evento del boton
+      child: Text('Guardar Cambios'), //Texto del boton
+      style: ElevatedButton.styleFrom( //Definimos estilos
+        backgroundColor: Color.fromARGB(255, 0, 164, 65), //Color del boton
+      ),
+    ),
+  );
+}
