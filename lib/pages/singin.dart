@@ -144,7 +144,7 @@ Widget Inicia_Sesion(context) {
         onPressed: () => {
         Navigator.push(
             context,
-            MaterialPageRoute(builder: (context)=>singin()))
+            MaterialPageRoute(builder: (context)=>login()))
         }, //Evento del boton
         child: Text("Inicia Sesion"), 
         style: TextButton.styleFrom(

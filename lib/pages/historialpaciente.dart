@@ -13,12 +13,6 @@ class historial extends StatefulWidget {
 
 class _historialState extends State<historial> {
 
-  List <Cita> _citas = [
-    Cita("10:25", "10/05/2022", "Odontologia"),
-    Cita("11:40", "18/05/2022", "Odontologia"),
-    Cita("12:25", "20/06/2022", "Odontologia"),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,6 +91,7 @@ class _historialState extends State<historial> {
               child: ListView( //Creamos un contenedor que va poder hacer scroll
                 children: <Widget> [ //creamos una lista que pondra mas widgets uno tras otro
                   listado(context),
+                  btncita(context),
                 ],
               )
             ),
@@ -115,26 +110,30 @@ class _historialState extends State<historial> {
   }
 }
 
+
+
 Widget listado(context) {
-  return ListView.builder(
-    itemCount: _citas.length,
-    itemBuilder: (context, index) {
-      return ListTile(
-        title: Text(_citas[index].hora + " " + _citas[index].fecha),
-        subtitle: Text(_citas[index].consultorio),
-        
-        trailing: Icon(Icons.arrow_forward_ios),
-      );
-    }
+  return ListTile(
+      title: Text("10:40am" + "     " + "05/10/2023"),
+      subtitle: Text("Odontología"),
+      trailing: Icon(Icons.arrow_forward_ios), 
+      leading: Icon(Icons.access_time, size: 36.0,),
   );
 }
 
-class Cita {
-  String hora;
-  String fecha;
-  String consultorio;
-
-  Cita(this.hora, this.fecha, this.consultorio);
+Widget btncita(context) {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 95, vertical: 5),
+    child: ElevatedButton( //Boton con estilos ya establecidos
+      onPressed: () => {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context)=>historial()))
+      }, //Evento del boton
+      child: Text('Solicitar Cita'), //Texto del boton
+      style: ElevatedButton.styleFrom( //Definimos estilos
+        backgroundColor: Color.fromARGB(255, 0, 164, 65), //Color del boton
+      ),
+    ),
+  );
 }
-
-List<Cita> _citas = [];
