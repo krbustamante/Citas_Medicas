@@ -1,5 +1,6 @@
 import 'package:citas_medicas/pages/historialpaciente.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(const perfil());
 
@@ -13,36 +14,39 @@ class perfil extends StatefulWidget {
 class _perfilState extends State<perfil> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Editar Perfil"),
-      ),
-      body: Container( //Creamos un contenedor
-          child: Center( //centramos el contenido
-            child: ListView( //Creamos un contenedor que va poder hacer scroll
-              children: <Widget> [ //creamos una lista que pondra mas widgets uno tras otro
-               
-                Nombre(),
-                Apellido(),
-                Correo_Electronico(),
-                Edad(),
-                Direccion(),
-                Contrasenia(),
-                btnsave(context),
-              ],
-            )
-            ),
-          decoration: BoxDecoration(
-                  gradient: LinearGradient(              
-                    colors: [
-                      Colors.cyan.shade200,
-                      Colors.cyan.shade500,               
-                    ],  
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,                    
-                  ),
-                ),        
-        )
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+        appBar: AppBar(
+          title: Text("Editar Perfil"),
+        ),
+        body: Container( //Creamos un contenedor
+            child: Center( //centramos el contenido
+              child: ListView( //Creamos un contenedor que va poder hacer scroll
+                children: <Widget> [ //creamos una lista que pondra mas widgets uno tras otro
+                
+                  Nombre(),
+                  Apellido(),
+                  Correo_Electronico(),
+                  Edad(),
+                  Direccion(),
+                  Contrasenia(),
+                  btnsave(context),
+                ],
+              )
+              ),
+            decoration: BoxDecoration(
+                    gradient: LinearGradient(              
+                      colors: [
+                        Colors.cyan.shade200,
+                        Colors.cyan.shade500,               
+                      ],  
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,                    
+                    ),
+                  ),        
+          )
+      )
     );
   }
 }

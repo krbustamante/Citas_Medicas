@@ -1,6 +1,9 @@
 import 'package:citas_medicas/main.dart';
 import 'package:citas_medicas/pages/perfil.dart'; 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:convert';
 
 void main() => runApp(const historial());
 
@@ -15,10 +18,12 @@ class _historialState extends State<historial> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold (  
           appBar: AppBar(
             title: Text("Citas Médicas"),
-          ),
+          ),          
           drawer: Drawer(
             child: Container(
               child: Center( //centramos el contenido
@@ -106,17 +111,19 @@ class _historialState extends State<historial> {
                     ),
                   ),        
           ),
+    )
     );
   }
+
+Future<List> getData() async {
+  final response = await http.get(Uri.parse('http://krbustamante.byethost7.com/php/getdata.php'));
+  return json.decode(response.body);
 }
-
-
-
+  
 Widget listado(context) {
   return ListTile(
       title: Text("10:40am" + "     " + "05/10/2023"),
-      subtitle: Text("Odontología"),
-      trailing: Icon(Icons.arrow_forward_ios), 
+      subtitle: Text("Odontología" + "     " + "Doctor"),
       leading: Icon(Icons.access_time, size: 36.0,),
   );
 }
@@ -136,4 +143,5 @@ Widget btncita(context) {
       ),
     ),
   );
+}
 }

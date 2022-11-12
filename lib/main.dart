@@ -1,11 +1,16 @@
+import 'dart:convert';
 import 'package:citas_medicas/pages/historialpaciente.dart';
 import 'package:citas_medicas/pages/singin.dart';
 import 'package:flutter/material.dart'; //Importamos el material.dart  
-import 'package:citas_medicas/pages/lostpassword.dart';
+import 'package:citas_medicas/pages/lostpassword.dart'; 
+import 'package:http/http.dart' as http;
+import 'dart:async'; 
+
 // Atajo para crear esqueleto: mateapp
 
 void main() {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     home: login() ,
     ),
   );
@@ -34,7 +39,8 @@ class _loginState extends State<login> {
                 correo(),
                 password(),
                 passforgot(context),
-                btnlogin(context),
+                btnlogin(context), 
+                mensaje(),
                 registrate(context),     
               ],
             )
@@ -53,6 +59,46 @@ class _loginState extends State<login> {
       )
     );
   }
+
+TextEditingController controllerEmail = new TextEditingController();
+TextEditingController controllerPass = new TextEditingController();
+
+String msg = '';
+bool _obscureText = true;
+bool _status = true;
+Future<List> _login() async {
+  final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/login.php'), 
+  body: {
+    "email": controllerEmail.text,
+    "password": controllerPass.text,
+  });
+
+  var datauser = json.decode(response.body);
+
+  //print( datauser);
+
+if(datauser.length==0){
+   print("Verifica los daros");
+   
+   setState(() {
+      msg="Email o Contraseña Incorrectos";
+      _status = false;
+    });
+   
+
+}else {
+  if (datauser[0]['rol'] == 'paciente') { 
+    setState(() {
+      _status = true; 
+      msg="Inició Sesión correctamente";
+    });
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context)=>historial()));
+    }
+}
+
+  return datauser;
 }
 
 
@@ -77,6 +123,7 @@ Widget correo() {
       children: [ //hace una lista de varios widgeta
         //Campo Correo Electrónico
         TextField(  //Campo de Texto
+          controller: controllerEmail,
           decoration: InputDecoration( //Dentro podemos poner los estilos del campo
             prefixIcon: Icon(Icons.email),
             hintText: "Correo Electrónico", //Texto dentro del campo
@@ -94,13 +141,24 @@ Widget password() {
     child: Column(
     children: [
     TextField(
-      obscureText: true, //oculta las contraseñas
+      controller: controllerPass,
+      obscureText: _obscureText,
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.lock),
         hintText: "Contraseña",
         fillColor: Colors.white,
         filled: true,
-        suffixIcon: Icon(Icons.visibility_off),           
+        suffixIcon: GestureDetector(
+          onTap: () {
+            setState(() {
+              _obscureText=!_obscureText;
+            });
+
+          },
+          child: Icon(_obscureText 
+          ? Icons.visibility 
+          : Icons.visibility_off),
+        ),   
         ),
       ),
     ]),
@@ -112,10 +170,11 @@ Widget btnlogin(context) {
   return Container(
     padding: EdgeInsets.symmetric(horizontal: 95, vertical: 5),
     child: ElevatedButton( //Boton con estilos ya establecidos
-      onPressed: () => {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context)=>historial()))
+      onPressed: () {
+        _login();  
+        setState(() {
+          msg="Intentalo de nuevo";
+        });   
       }, //Evento del boton
       child: Text('Iniciar Sesión'), //Texto del boton
       style: ElevatedButton.styleFrom( //Definimos estilos
@@ -125,9 +184,15 @@ Widget btnlogin(context) {
   );
 }
 
+Widget mensaje() { 
+  return Text(msg,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,);
+}
 Widget passforgot(context) {
   return TextButton( //boton sin estilos
     onPressed: () => {
+
+     
+
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context)=>lostpass()))
@@ -161,4 +226,6 @@ Widget registrate(context) {
         ),
     ],
   );
+}
+
 }
