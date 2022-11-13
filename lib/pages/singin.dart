@@ -4,6 +4,8 @@ import 'package:citas_medicas/pages/historialpaciente.dart';
 import 'package:flutter/material.dart';  
 import 'package:http/http.dart' as http;
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart'; 
+
 class singin extends StatefulWidget {
 
   @override
@@ -24,6 +26,7 @@ String msg = '';
 final _formkey = GlobalKey<FormState>();
 
 Future<List> _newUser() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/adddata.php'), 
   body: {
     "nombre": nombre_txt.text,
@@ -37,7 +40,12 @@ Future<List> _newUser() async {
   var datauser = json.decode(response.body);
 
   setState(() {
+
     msg="Cuenta creada!";
+    prefs.setString("email", email_txt.text);
+    prefs.setString("password", pass_txt.text);
+    prefs.setString("nombre", nombre_txt.text); 
+    prefs.setString("apellido", apellido_txt.text);
   });
     
   Navigator.push(
