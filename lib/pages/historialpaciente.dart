@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(const historial());
 
 class historial extends StatefulWidget {
   const historial({super.key});
@@ -16,6 +16,34 @@ class historial extends StatefulWidget {
 
 class _historialState extends State<historial> {
 
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    mostrar_datos();
+  }
+
+bool? load_logged = false; 
+String? load_email = '';
+String? load_password = '';
+String? load_nombre = '';
+
+Future<void> mostrar_datos() async{
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  setState(() {
+    load_logged =  prefs.getBool("logged");
+    load_email =  prefs.getString("email");
+    load_password =  prefs.getString("password");
+    load_nombre =  prefs.getString("nombre");
+  });
+  print(load_nombre.toString());
+}
+
+Future<void> logout() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.clear();
+}
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -38,15 +66,25 @@ class _historialState extends State<historial> {
                           children: <Widget> [ 
                             Container(
                               decoration: new BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(40)),
+                                borderRadius: BorderRadius.all(Radius.circular(100)),
                               ),
-                              width: 100,
-                              height: 100,
+                              width: 90,
+                              height: 90,
                               child: CircleAvatar(
-                                backgroundImage: NetworkImage("https://umburoff.sirv.com/Images/luffy.jpg",),
-                              )               
+                                //border
+                                radius: 100,
+                                child: CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage: NetworkImage(
+                                      'https://umburoff.sirv.com/Images/luffy.jpg'),
+                                ),
+                              ),             
                             ),
-                            const Text("krbustamante", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.white),textAlign: TextAlign.center,),
+                            
+                            Text(load_nombre.toString(), style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18.0, color: Colors.white),textAlign: TextAlign.center,),
+                            
+                            Text(load_email.toString(), style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0, color: Colors.white),textAlign: TextAlign.center,),
+                            
                           ],
                         ),
                       ),
@@ -55,7 +93,7 @@ class _historialState extends State<historial> {
                       child: ListTile(
                         leading: Icon(Icons.account_circle),
                         title: Text('Perfil'),
-                        onTap: () => {
+                        onTap: () => { 
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context)=>perfil())
@@ -80,6 +118,7 @@ class _historialState extends State<historial> {
                         leading: Icon(Icons.exit_to_app),
                         title: Text('Salir'),
                         onTap: () => {
+                          logout(),
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context)=>login()))

@@ -4,7 +4,8 @@ import 'package:citas_medicas/pages/singin.dart';
 import 'package:flutter/material.dart'; //Importamos el material.dart  
 import 'package:citas_medicas/pages/lostpassword.dart'; 
 import 'package:http/http.dart' as http;
-import 'dart:async'; 
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart'; 
 
 // Atajo para crear esqueleto: mateapp
 
@@ -15,29 +16,87 @@ void main() {
     ),
   );
 }
+
+
 class login extends StatefulWidget {
   const login({super.key});
-
   @override
   State<login> createState() => _loginState();
 }
 
+
 class _loginState extends State<login> {
+
+  final _formkey = GlobalKey<FormState>();
+
   @override
-  Widget build(BuildContext context) {
-    
+  Widget build(BuildContext context) {    
     return MaterialApp(
       title: "Inicia Sesión",
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container( //Creamos un contenedor
-          child: Center( //centramos el contenido
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          
+          child: Form( //centramos el contenido
+            key: _formkey,
             child: ListView( //Creamos un contenedor que va poder hacer scroll
-              children: <Widget> [ //creamos una lista que pondra mas widgets uno tras otro
+              children: <Widget> [
                 head(),
                 headimg(),
-                correo(),
-                password(),
+                SizedBox(height: 10.0,),
+                TextFormField(
+                  controller: controllerEmail,
+                  autocorrect: true,
+                  keyboardType:TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.email),
+                    labelText: "Email",
+                    fillColor: Colors.white,
+                    filled: true,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  validator: (value) => value!.isEmpty || !value.contains("@")
+                  ? "ingresa un correo válido"
+                  : null,
+                ),
+                SizedBox(height: 10.0,),
+                TextFormField(
+                  controller: controllerPass,
+                  obscureText: _obscureText,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    prefixIcon: Icon(Icons.lock),
+                    hintText: "Contraseña",
+                    fillColor: Colors.white,
+                    filled: true,
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _obscureText=!_obscureText;
+                        });
+
+                      },
+                      child: Icon(_obscureText 
+                      ? Icons.visibility 
+                      : Icons.visibility_off),
+                    ),   
+                    ),
+                  validator: (value) {
+                    if(value!.isEmpty) {
+                      return "Ingresa una contraseña";
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+                SizedBox(height: 10.0,),
                 passforgot(context),
                 btnlogin(context), 
                 mensaje(),
@@ -46,15 +105,15 @@ class _loginState extends State<login> {
             )
             ),
           decoration: BoxDecoration(
-                  gradient: LinearGradient(              
-                    colors: [
-                      Colors.cyan.shade200,
-                      Colors.cyan.shade500,               
-                    ],  
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,                    
-                  ),
-                ),        
+            gradient: LinearGradient(              
+              colors: [
+                Colors.cyan.shade200,
+                Colors.cyan.shade500,               
+              ],  
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,                    
+            ),
+          ),        
         ),
       )
     );
@@ -66,40 +125,85 @@ TextEditingController controllerPass = new TextEditingController();
 String msg = '';
 bool _obscureText = true;
 bool _status = true;
+
 Future<List> _login() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/login.php'), 
   body: {
     "email": controllerEmail.text,
     "password": controllerPass.text,
   });
-
   var datauser = json.decode(response.body);
 
-  //print( datauser);
-
 if(datauser.length==0){
-   print("Verifica los daros");
+  print("Verifica los daros");
    
-   setState(() {
-      msg="Email o Contraseña Incorrectos";
-      _status = false;
-    });
-   
-
+  setState(() {
+    msg="Email o Contraseña Incorrectos";
+    _status = false;
+    prefs.setBool("logged", false);
+  });
 }else {
   if (datauser[0]['rol'] == 'paciente') { 
     setState(() {
       _status = true; 
-      msg="Inició Sesión correctamente";
+      msg="Sesión Iniciada correctamente";
+
+      prefs.setBool("logged", true);
+      prefs.setString("email", controllerEmail.text);
+      prefs.setString("password", controllerPass.text);
+      prefs.setString("nombre", datauser[0]['nombre']);
+      prefs.setString("ID_Usuario", datauser[0]['ID_Usuario']);
+      prefs.setString("apellido", datauser[0]['apellido']);
+      msg="Sesión guardada";
     });
+
+    bool logged = true;
+    String nombre = datauser[0]['nombre'];
+    print("registrando: " +datauser[0]['ID_Usuario']);
+    guardar_datos(logged,controllerEmail.text,controllerPass.text, nombre);
     Navigator.push(
         context,
         MaterialPageRoute(builder: (context)=>historial()));
     }
 }
-
   return datauser;
 }
+
+Future<void> guardar_datos(bool logged, String email, String password, String nombre) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('logged', logged);
+  await prefs.setString('email', email);
+  await prefs.setString('password', password);
+  await prefs.setString('Nombre', nombre);
+}
+
+bool? load_logged = false; 
+String? load_email = '';
+String? load_password = '';
+String? load_nombre = '';
+
+Future<void> mostrar_datos() async{
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  load_logged = await prefs.getBool("logged");
+  load_email = await prefs.getString("email");
+  load_password = await prefs.getString("password");
+  load_nombre = await prefs.getString("nombre");
+
+  print(load_email.toString());
+  if(load_logged != false) {
+    if(load_logged != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context)=>historial()));
+    }
+  }
+}
+  @override
+  void initState() {
+    super.initState();
+    mostrar_datos();
+  }
 
 
 Widget head() {
@@ -115,66 +219,22 @@ Widget headimg() {
     child: Image.network("https://umburoff.sirv.com/Images/img_311846.png"), //Imagen de internet
   );
 }
-Widget correo() { 
-  return Container(
-    //padding horizontal y vertical
-    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-    child: Column( //contenedor columna para poner varios widgets consecutivos
-      children: [ //hace una lista de varios widgeta
-        //Campo Correo Electrónico
-        TextField(  //Campo de Texto
-          controller: controllerEmail,
-          decoration: InputDecoration( //Dentro podemos poner los estilos del campo
-            prefixIcon: Icon(Icons.email),
-            hintText: "Correo Electrónico", //Texto dentro del campo
-            fillColor: Colors.white, //color del background del campo
-            filled: true, //habilitamos el color
-           ),
-        ),
-    ]),
-  );
-}
-
-Widget password() {
-  return Container(
-    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-    child: Column(
-    children: [
-    TextField(
-      controller: controllerPass,
-      obscureText: _obscureText,
-      decoration: InputDecoration(
-        prefixIcon: Icon(Icons.lock),
-        hintText: "Contraseña",
-        fillColor: Colors.white,
-        filled: true,
-        suffixIcon: GestureDetector(
-          onTap: () {
-            setState(() {
-              _obscureText=!_obscureText;
-            });
-
-          },
-          child: Icon(_obscureText 
-          ? Icons.visibility 
-          : Icons.visibility_off),
-        ),   
-        ),
-      ),
-    ]),
-  );
-}
 
 
 Widget btnlogin(context) {
   return Container(
-    padding: EdgeInsets.symmetric(horizontal: 95, vertical: 5),
+    padding: EdgeInsets.symmetric(horizontal: 70, vertical: 5),
     child: ElevatedButton( //Boton con estilos ya establecidos
       onPressed: () {
-        _login();  
-        setState(() {
-          msg="Intentalo de nuevo";
-        });   
+        if(_formkey.currentState!.validate()) {
+          final snackBar=SnackBar(content: Text('Iniciando Sesión'));
+          _login();  
+          setState(() {
+            msg="Verificando datos...";
+          }); 
+
+
+        }
       }, //Evento del boton
       child: Text('Iniciar Sesión'), //Texto del boton
       style: ElevatedButton.styleFrom( //Definimos estilos
@@ -185,6 +245,7 @@ Widget btnlogin(context) {
 }
 
 Widget mensaje() { 
+  contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0);
   return Text(msg,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,);
 }
 Widget passforgot(context) {
