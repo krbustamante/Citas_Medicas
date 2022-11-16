@@ -155,6 +155,8 @@ if(datauser.length==0){
       prefs.setString("nombre", datauser[0]['nombre']);
       prefs.setString("ID_Usuario", datauser[0]['ID_Usuario']);
       prefs.setString("apellido", datauser[0]['apellido']);
+      prefs.setString("edad", datauser[0]['edad']);
+      prefs.setString("direccion", datauser[0]['direccion']);
       msg="Sesión guardada";
     });
 

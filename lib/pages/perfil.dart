@@ -14,23 +14,29 @@ class perfil extends StatefulWidget {
 }
 
 class _perfilState extends State<perfil> {
-
-TextEditingController nombre_txt = new TextEditingController();
-TextEditingController apellido_txt = new TextEditingController();
-TextEditingController email_txt = new TextEditingController();
-TextEditingController edad_txt = new TextEditingController();
-TextEditingController direccion_txt = new  TextEditingController();
-TextEditingController pass_txt = new TextEditingController();
-
 String msg = '';
-
 final _formkey = GlobalKey<FormState>();
+
+TextEditingController nombre_txt = TextEditingController();
+TextEditingController apellido_txt = TextEditingController();
+TextEditingController email_txt = TextEditingController();
+TextEditingController edad_txt = TextEditingController();
+TextEditingController direccion_txt =  TextEditingController();
+TextEditingController pass_txt = TextEditingController();
+ 
 
 @override
   void initState() {
     // TODO: implement initState
     super.initState();
     mostrar_datos(); 
+
+    nombre_txt = TextEditingController(text: load_nombre);
+    apellido_txt = TextEditingController(text: load_apellido);
+    email_txt = TextEditingController(text: load_email);
+    edad_txt = TextEditingController(text: load_edad);
+    direccion_txt = TextEditingController(text: load_direccion);
+    pass_txt = TextEditingController(text: load_password);
   }
 
 bool? load_logged = false; 
@@ -39,6 +45,8 @@ String? load_password = '';
 String? load_nombre = '';
 String? load_ID_Usuario = '';
 String? load_apellido = '';
+String? load_edad = '';
+String? load_direccion = '';
 
 Future<void> mostrar_datos() async{
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -50,36 +58,19 @@ Future<void> mostrar_datos() async{
     load_nombre =  prefs.getString("nombre");
     load_ID_Usuario = prefs.getString("ID_Usuario");
     load_apellido = prefs.getString("apellido");
+    load_edad = prefs.getString("edad");
+    load_direccion = prefs.getString("direccion"); 
   });
-  print("EL ID" + load_ID_Usuario.toString());
 }
 
-String id='',nombre='',apellido='',email='';
-
-Future<List> _datauser() async {
-  final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/get_by_id.php'), 
-  body: {
-    "ID_Usuario": load_ID_Usuario,
-  });
-  var datauser = json.decode(response.body);
-  setState(() {
-    id = datauser[0]['ID_Usuario'];
-    nombre = datauser[0]['nombre'];
-    apellido = datauser[0]['apellido'];
-    email = datauser[0]['email'];
-    });
-  print(id + nombre+ apellido + email);
-  editData();
-  return datauser;
-}
 
 void editData() {
     var url=Uri.parse('http://krbustamante.byethost7.com/php/editdata.php');
     http.post(url,body: {
-      "ID_Usuario": id,
-      "nombre": nombre,
-      "apellido": apellido,
-      "email": email,
+      "ID_Usuario": load_ID_Usuario.toString(),
+      "nombre": load_nombre,
+      "apellido": load_apellido,
+      "email": load_email,
       "direccion": direccion_txt.text,
       "password": pass_txt.text,
       "edad": edad_txt.text,
@@ -89,11 +80,9 @@ void editData() {
       msg="Cuenta Actualizada";
     });
     
-    Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context)=>historial()));
-
+    Navigator.push(context,MaterialPageRoute(builder: (context)=>historial()));
   }
+
 
 
   @override
@@ -106,7 +95,11 @@ void editData() {
             builder: (BuildContext context) {
               return IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () {Navigator.pop(context); }, 
+                onPressed: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context)=>historial()));
+                }, 
               );
             },
           ),       
@@ -132,6 +125,7 @@ void editData() {
                   ),
                 ), 
                 SizedBox(height: 10.0,),
+                Text("Nombre: "),
                 TextField(
                   enabled: false,
                   controller: nombre_txt,
@@ -146,6 +140,7 @@ void editData() {
                   ),
                 ),
                 SizedBox(height: 10.0,),
+                Text("Apellido:"),
                 TextField(
                   controller: apellido_txt,
                   enabled: false,
@@ -160,6 +155,7 @@ void editData() {
                   ),                 
                 ),
                 SizedBox(height: 10.0,),
+                Text("Correo electrónico: "),
                 TextField(
                   controller: email_txt,
                   enabled: false,
@@ -172,12 +168,13 @@ void editData() {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),               
-                ),
+                ),                
                 SizedBox(height: 10.0,),
+                Text("Edad: "),
                 TextFormField(
                   controller: edad_txt,
                   decoration: InputDecoration(
-                    labelText: "Edad",
+                    labelText: load_edad,
                     fillColor: Colors.white,
                     filled: true,
                     contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 16),
@@ -193,12 +190,13 @@ void editData() {
                       return null;
                     }
                   },
-                ), 
+                ),  
                 SizedBox(height: 10.0,),
+                Text("Direccion"),
                 TextFormField(
                   controller: direccion_txt,
                   decoration: InputDecoration(
-                    labelText: "Dirección",
+                    labelText: load_direccion,
                     fillColor: Colors.white,
                     filled: true,
                     contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 16),
@@ -215,10 +213,11 @@ void editData() {
                   },
                 ),
                 SizedBox(height: 10.0,),
+                Text("Contraseña: "),
                 TextFormField(
                   controller: pass_txt,
                   decoration: InputDecoration(
-                    labelText: "Contraseña",
+                    labelText: load_password,
                     fillColor: Colors.white,
                     filled: true,
                     contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 16),
@@ -241,9 +240,7 @@ void editData() {
                     Text("¿Ya tienes una cuenta? ", style: TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.bold)),
                     TextButton(
                       onPressed: () { 
-                          Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context)=>login()));                       
+                          Navigator.push(context,MaterialPageRoute(builder: (context)=>login()));                       
                       },
                     //Evento del boton
                       child: Text("Inicia Sesion"), 
@@ -258,18 +255,19 @@ void editData() {
                 mensaje(),
                 SizedBox(height: 10.0,),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 70, vertical: 5),
+                  padding: EdgeInsets.symmetric(horizontal: 60, vertical: 5),
                   child: ElevatedButton( //Boton con estilos ya establecidos
                   onPressed: () {
                     if(_formkey.currentState!.validate()) { 
                       setState(() {
                         msg="Verificando datos...";
                       });                   
-                      
-                      _datauser();
+                      editData();
+                      logout();
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>login()));  
                     }
                   }, //Evento del boton
-                  child: Text('Registrarse'), //Texto del boton
+                  child: Text('Actualizar Datos'), //Texto del boton
                   style: ElevatedButton.styleFrom( //Definimos estilos
                     backgroundColor: Color.fromARGB(255, 0, 164, 65), //Color del boton
                   ),
@@ -294,8 +292,11 @@ void editData() {
   }
 
   Widget mensaje() { 
-  contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0);
-  return Text(msg,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,);
-}
-
+    contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0);
+    return Text(msg,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,);
+  }
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+  }
 }

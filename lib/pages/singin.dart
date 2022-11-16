@@ -22,9 +22,9 @@ TextEditingController direccion_txt = new  TextEditingController();
 TextEditingController pass_txt = new TextEditingController();
 
 String msg = '';
-
+String id = '';
 final _formkey = GlobalKey<FormState>();
-
+ 
 Future<List> _newUser() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/adddata.php'), 
@@ -38,19 +38,23 @@ Future<List> _newUser() async {
     "rol": "paciente",
   });
   var datauser = json.decode(response.body);
-
+ 
   setState(() {
-
     msg="Cuenta creada!";
+    
+  });
+    
+    setState(() {
+    msg="Inicia Sesión";
     prefs.setString("email", email_txt.text);
     prefs.setString("password", pass_txt.text);
     prefs.setString("nombre", nombre_txt.text); 
-    prefs.setString("apellido", apellido_txt.text);
+    prefs.setString("apellido", apellido_txt.text);  
+    prefs.setString("edad", edad_txt.text);
+    prefs.setString("direccion", direccion_txt.text);    
   });
-    
-  Navigator.push(
-  context,
-  MaterialPageRoute(builder: (context)=>historial()));
+
+  Navigator.push(context,MaterialPageRoute(builder: (context)=>login()));
   return datauser;
 }
 
@@ -64,6 +68,9 @@ Future<List> _verifyEmail() async {
 if(datauser.length==0){
     
   print("No existe el correo");
+  setState(() {
+    msg="Creando cuenta...";
+  });
   _newUser();
   
 }else {
@@ -82,6 +89,19 @@ if(datauser.length==0){
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context)=>login()));
+                }, 
+              );
+            },
+          ),       
+          centerTitle: true,
           title: Text("Registrate"),
         ),
         body: Container( //Creamos un contenedor
