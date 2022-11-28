@@ -5,17 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Flutter",
+            "name": "Dart & Flutter",
             "type": "dart",
             "request": "launch",
             "program": "lib/main.dart"
-        },
-        
-        {
-            "name": "citas_medicas",
-            "cwd": "citas_medicas",
-            "request": "launch",
-            "type": "dart", 
         },
         {
             "name": "citas_medicas (profile mode)",

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(const perfil());
 
 class perfil extends StatefulWidget {
   const perfil({super.key});
@@ -79,11 +78,14 @@ void editData() {
     setState(() {
       msg="Cuenta Actualizada";
     });
-    
+    logout();
     Navigator.push(context,MaterialPageRoute(builder: (context)=>historial()));
   }
 
-
+Future<void> logout() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.clear();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -295,8 +297,5 @@ void editData() {
     contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0);
     return Text(msg,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,);
   }
-  Future<void> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.clear();
-  }
+ 
 }

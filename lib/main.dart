@@ -126,7 +126,7 @@ String msg = '';
 bool _obscureText = true;
 bool _status = true;
 
-Future<List> _login() async {
+Future<void> _login() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/login.php'), 
   body: {
@@ -168,8 +168,7 @@ if(datauser.length==0){
         context,
         MaterialPageRoute(builder: (context)=>historial()));
     }
-}
-  return datauser;
+} 
 }
 
 Future<void> guardar_datos(bool logged, String email, String password, String nombre) async {
@@ -234,8 +233,6 @@ Widget btnlogin(context) {
           setState(() {
             msg="Verificando datos...";
           }); 
-
-
         }
       }, //Evento del boton
       child: Text('Iniciar Sesión'), //Texto del boton

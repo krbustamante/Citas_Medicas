@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:date_time_picker/date_time_picker.dart';
 
-class singin extends StatefulWidget {
+class newcita extends StatefulWidget {
   @override
-  State<singin> createState() => _singinState();
+  State<newcita> createState() => _newcitaState();
 }
 
-class _singinState extends State<singin> {
+class _newcitaState extends State<newcita> {
 
 TextEditingController nombre_txt = new TextEditingController();
 TextEditingController apellido_txt = new TextEditingController();
@@ -79,8 +80,13 @@ if(datauser.length==0){
   }
 }
   return datauser;
-}
+} 
 
+final _dateController = TextEditingController();
+final _timeController1 = TextEditingController();
+
+TextEditingController fecha = new TextEditingController();
+String textofecha = "Seleccionar Fecha";
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -109,7 +115,43 @@ if(datauser.length==0){
             key: _formkey,
             child: ListView( //Creamos un contenedor que va poder hacer scroll
               children: <Widget> [ //creamos una lista que pondra mas widgets uno tras otro
+                SizedBox(height: 50.0,),
+                Text("Selecciona una fecha y una hora para tu cita, tu doctor y tu consultorio los verás en tu historial.", style: TextStyle(color: Colors.black, fontSize: 16.0, fontWeight: FontWeight.w400),textAlign: TextAlign.center,),
+                SizedBox(height: 50.0,),
+                DateTimePicker(
+                  type: DateTimePickerType.dateTimeSeparate,
+                  dateMask: 'd MMM, yyyy',
+                  initialValue: DateTime.now().toString(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),                 
+                  dateLabelText: 'Fecha',
+                  timeLabelText: "Hora",
+                  decoration: InputDecoration(  
+                    fillColor: Colors.white,
+                    filled: true, 
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  selectableDayPredicate: (date) {
+                    // Disable weekend days to select from the calendar
+                    if (date.weekday == 6 || date.weekday == 7) {
+                      return false;
+                    }
 
+                    return true;
+                  },
+                  onChanged: (val) => print(val),
+                  validator: (val) {
+                    print(val);
+                    return null;
+                  },
+                  onSaved: (val) => print(val),
+                ),
+                SizedBox(height: 20.0,),
+                mensaje(),
+                SizedBox(height: 20.0,),
+                btncreatecita(),
               ],
             )
           ),
@@ -133,4 +175,27 @@ Widget mensaje() {
   return Text(msg,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,);
 }
 
+Widget btncreatecita() {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 70, vertical: 5),
+    child: ElevatedButton( //Boton con estilos ya establecidos
+      onPressed: () {
+        if(_formkey.currentState!.validate()) {
+          final snackBar=SnackBar(content: Text('Iniciando Sesión'));
+          
+          setState(() {
+            msg="Verificando datos...";
+          }); 
+        }
+      }, //Evento del boton
+      child: Text('Crear cita'), //Texto del boton
+      style: ElevatedButton.styleFrom( //Definimos estilos
+        backgroundColor: Color.fromARGB(255, 0, 164, 65), //Color del boton
+      ),
+    ),
+  );
 }
+
+
+}
+

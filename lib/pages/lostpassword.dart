@@ -1,20 +1,17 @@
-import 'dart:convert';
-
-import 'package:citas_medicas/main.dart';
+import 'dart:convert'; 
+import 'package:citas_medicas/pages/perfil.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'package:shared_preferences/shared_preferences.dart'; 
 
-void main() => runApp(const lostpass());
-
+import 'package:shared_preferences/shared_preferences.dart';  
 class lostpass extends StatefulWidget {
   const lostpass({super.key});
-
+  
   @override
   State<lostpass> createState() => _MyAppState();
 }
-
+/** Codigo de aplicacion: vpwladplywaasnmt **/
 class _MyAppState extends State<lostpass> {
   @override
   Widget build(BuildContext context) {
@@ -30,6 +27,10 @@ class _MyAppState extends State<lostpass> {
                   correo(),
                   mensaje(),
                   btnsendemail(context),
+                  SizedBox(height: 20.0,),
+                  codigo(),
+                  mensajecode(),
+                  btnsendcode(),
                 ],
               )
               ),
@@ -46,11 +47,26 @@ class _MyAppState extends State<lostpass> {
           ),
     );
   }
+FocusNode myFocusNode = FocusNode();
 
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    myFocusNode = FocusNode();
+  }
+@override
+  void dispose() {
+    // Limpia el nodo focus cuando se haga dispose al formulario
+    myFocusNode.dispose();
+        
+    super.dispose();
+  }
 String msg = '';
-TextEditingController email_txt = new TextEditingController();
+bool codesended = false;
 
   Future<List> _verifyEmail() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/getemail.php'), 
   body: {
     "email": email_txt.text,
@@ -67,115 +83,55 @@ if(datauser.length==0){
 }else { 
     setState(() {
       msg="Generando codigo...";
+      prefs.setBool("logged", false);
+      prefs.setString("email", datauser[0]['email']);
+      prefs.setString("password", datauser[0]['password']);
+      prefs.setString("nombre", datauser[0]['nombre']);
+      prefs.setString("ID_Usuario", datauser[0]['ID_Usuario']);
+      prefs.setString("apellido", datauser[0]['apellido']);
+      prefs.setString("edad", datauser[0]['edad']);
+      prefs.setString("direccion", datauser[0]['direccion']);
     }); 
-    _generateCode();
+
+    _sendemail();
 }
   return datauser;
 }
 
-
-String codigov = '';
-
-Future<List> _generateCode() async {
-  final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/generatecode.php'), 
+Future<void> _sendemail() async {
+  final response = await http.post(Uri.parse('http://citasmedicas.atwebpages.com/sendemail.php'), 
   body: {
     "email": email_txt.text,
   });
-  var codigo = json.decode(response.body);
+  var datauser = json.decode(response.body);
 
-if(codigo.length==0){
+if(datauser.length==0){
     
+  print("Ocurrio un error enviando el correo");
   setState(() {
-    msg="Ocurrio un error";
+    msgcode="Ocurrio un error enviando el correo";
   });
-} else {
-  setState(() {
-    msg="Escribe el codigo de verificacion";
-    codigov = codigo.toString();
-  });
-  sendEmail(
-    name: "Citas Medicas", 
-    email: "kevinricardo258@gmail.com", 
-    subject: email_txt.text, 
-    message: "Recientemente pediste el restablecimiento de tu constraseña. Ingresa este codigo en la aplicacion y cambia tu contraseña" + codigov,
-  );
+  
+}else { 
+    setState(() {
+      msg="Ahora escribe el codigo de verificacion";
+      msgcode = "Escribe el codigo de verificacion";
+      codigov = datauser.toString();
+    }); 
+  print("XD parece que funciono" + datauser);
+
+  
+  FocusScope.of(context).requestFocus(myFocusNode);
 }
-  return codigo;
 }
 
-Future sendEmail({
-  required String name,
-  required String email,
-  required String subject,
-  required String message,
-}) async {
-  final serviceId = 'service_2xvax86';
-  final templateId = 'template_gvjpxva';
-  final userId = 'O4fCW71R9ix-XOl0a';
 
-  final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
-  final response = await http.post(
-    url,
-    headers: {
-      'origin': 'http://krbustamante.byethost7.com/',
-      'Content-Type': 'aplication/json',
-    },
-    body: json.encode({
-      'service_id': serviceId,
-      'template_id': templateId,
-      'user_id': userId,
-      'template_params': {
-        'user_name': name,
-        'user_subject': subject,
-        'user_message': message,
-      },
-    }) 
-    );
+String codigov = '';
+/* Eliminar xd */
 
-  print(response.body);
-} 
 TextEditingController codigo_txt = new TextEditingController();
 
-Widget verifycode() {
-  return Form( //centramos el contenido 
-    child: ListView( //Creamos un contenedor que va poder hacer scroll
-      children: <Widget> [ 
-        SizedBox(height: 10.0,),
-        Text("Código de verificación: "),
-        TextField(
-          enabled: false,
-          controller: codigo_txt,
-          decoration: InputDecoration(
-            labelText: "Codigo de Verificación",
-            fillColor: Colors.white,
-            filled: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 16),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-          ),
-        ),
-        ElevatedButton( //Boton con estilos ya establecidos
-          onPressed: () => {
-            if (codigo_txt.text == codigov) {
-              setState(() {
-                msg="El codigo es correcto!";
-              })
-            } else {
-              setState(() {
-                msg="El codigo introducido es incorrecto";
-              })
-            }
-          }, //Evento del boton
-          child: Text('Enviar'), //Texto del boton
-          style: ElevatedButton.styleFrom( //Definimos estilos
-            backgroundColor: Color.fromARGB(255, 0, 164, 65), //Color del boton
-          ),
-        ),
-      ]
-    )
-  );
-}
+TextEditingController email_txt = new TextEditingController();
 
 Widget head() {
   return Container(
@@ -184,77 +140,44 @@ Widget head() {
     child: Text("Te enviaremos un correo para que puedas restablecer tu contraseña", style: TextStyle(color: Colors.black, fontSize: 16.0, fontWeight: FontWeight.w400),textAlign: TextAlign.center,),
   );
 }
-
+ 
 Widget correo() {
-  return Container(
-    //padding horizontal y vertical
-    padding: EdgeInsets.fromLTRB(5.0, 20.0, 5.0, 20.0),
-    child: Column( //contenedor columna para poner varios widgets consecutivos
-      children: [ //hace una lista de varios widgeta
-        //Campo Correo Electrónico
-        TextField(  //Campo de Texto
-          controller: email_txt,
-          decoration: InputDecoration( //Dentro podemos poner los estilos del campo
-            prefixIcon: Icon(Icons.email),
-            hintText: "Correo Electrónico", //Texto dentro del campo
-            fillColor: Colors.white, //color del background del campo
-            filled: true, //habilitamos el color
-           ),
-        ),
-        Text(msgcode,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,),
-        ElevatedButton( //Boton con estilos ya establecidos
-          onPressed: () => {
-            showDialog(context: context, builder: (context) => AlertDialog(
-                title: Text("Recupera tu contraseña"),
-                content: Text("Revisa tu correo electrónico y sigue las instrucciones para restablecer tu contraseña."),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text("Aceptar"),
-                    onPressed: () => {
-
-                      _verifyEmail(),
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context)=>login()))
-                    },
-                  ),
-                ],
-              )
-            )
-          }, //Evento del boton
-          child: Text('Enviar'), //Texto del boton
-          style: ElevatedButton.styleFrom( //Definimos estilos
-            backgroundColor: Color.fromARGB(255, 0, 164, 65), //Color del boton
-          ),
-        ),
-    ]),
-  );
+  return TextFormField(
+            controller: email_txt,
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.email),
+              labelText: "Correo Electrónico",
+              fillColor: Colors.white,
+              filled: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 16),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+            ),
+            validator: (value) {
+              if(value!.isEmpty) {
+                return "Ingresa tu correo";
+              } else {
+                return null;
+              }
+            },
+          );  
 } 
 String msgcode = '';
 Widget btnsendemail(context) {
   return Container(
     padding: EdgeInsets.symmetric(horizontal: 95, vertical: 5),
     child: ElevatedButton( //Boton con estilos ya establecidos
-      onPressed: () => {
-        showDialog(context: context, builder: (context) => AlertDialog(
-            title: Text("Recupera tu contraseña"),
-            content: Text("Revisa tu correo electrónico y sigue las instrucciones para restablecer tu contraseña."),
-            actions: <Widget>[
-              TextButton(
-                child: Text("Aceptar"),
-                onPressed: () => {
-
-                  _verifyEmail(),
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context)=>login()))
-                },
-              ),
-            ],
-          )
-        )
+      
+      onPressed: () => { 
+        if (email_txt.text == null || email_txt.text == "") {
+          setState(() {
+            msg="Escribe tu correo"; 
+          })
+        } else {
+          _verifyEmail(), 
+        }
+      
       }, //Evento del boton
       child: Text('Enviar'), //Texto del boton
       style: ElevatedButton.styleFrom( //Definimos estilos
@@ -264,8 +187,76 @@ Widget btnsendemail(context) {
   );
 }
 
+
+Widget codigo() {
+  return TextFormField(
+            focusNode: myFocusNode,
+            controller: codigo_txt,
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.code),
+              labelText: "Codigo de Verificacion",
+              fillColor: Colors.white,
+              filled: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 11, vertical: 16),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+            ),
+            validator: (value) {
+              if(value!.isEmpty) {
+                return "Ingresa tu correo";
+              } else {
+                return null;
+              }
+            },
+          );  
+}  
+
+Future <void> loggedtrue() async {
+SharedPreferences prefs = await SharedPreferences.getInstance();
+prefs.setBool("logged", true);
+}
+
+ Widget btnsendcode()  {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 95, vertical: 5),
+    child: ElevatedButton( //Boton con estilos ya establecidos
+      
+      onPressed: () {
+         if (codigo_txt.text == null || codigo_txt.text == "") {
+          setState(() {
+            msg="Revisa tu email y escribe el codigo de verificacion"; 
+          });
+        } else {
+          if (codigo_txt.text == codigov) {
+            loggedtrue();
+            setState(() {
+              msgcode="Cambia tu contraseña";
+            });
+            Navigator.push(context,MaterialPageRoute(builder: (context)=>perfil()));
+          }
+        }
+      }, //Evento del boton
+      child: Text('Verificar xd'), //Texto del boton
+      style: ElevatedButton.styleFrom( //Definimos estilos
+        
+        backgroundColor: Color.fromARGB(255, 0, 164, 65), //Color del boton
+      ),
+    ),
+  );
+}
+
+
 Widget mensaje() { 
   contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0);
   return Text(msg,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,);
 }
+Widget mensajecode() { 
+  contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0);
+  return Text(msgcode,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,);
+}
+
+
+
+ 
 }

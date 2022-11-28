@@ -14,9 +14,10 @@ dependencies:
 
 
   cupertino_icons: ^1.0.2
-  http: any
-  image_picker: ^0.8.6
+  http: any 
   shared_preferences: ^2.0.15
+  date_time_picker: ^2.1.0   
+
 
 dev_dependencies:
   flutter_test:

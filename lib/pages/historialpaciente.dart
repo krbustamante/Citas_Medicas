@@ -1,4 +1,5 @@
 import 'package:citas_medicas/main.dart';
+import 'package:citas_medicas/pages/newcita.dart';
 import 'package:citas_medicas/pages/perfil.dart'; 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -154,10 +155,7 @@ Future<void> logout() async {
     );
   }
 
-Future<List> getData() async {
-  final response = await http.get(Uri.parse('http://krbustamante.byethost7.com/php/getdata.php'));
-  return json.decode(response.body);
-}
+
   
 Widget listado(context) {
   return ListTile(
@@ -174,7 +172,7 @@ Widget btncita(context) {
       onPressed: () => {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context)=>historial()))
+          MaterialPageRoute(builder: (context)=>newcita()))
       }, //Evento del boton
       child: Text('Solicitar Cita'), //Texto del boton
       style: ElevatedButton.styleFrom( //Definimos estilos
