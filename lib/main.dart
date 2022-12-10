@@ -7,7 +7,9 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart'; 
 
-// Atajo para crear esqueleto: mateapp
+// Atajo para crear esqueleto: mateapp 
+
+import 'package:flutter/material.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -136,8 +138,6 @@ Future<void> _login() async {
   var datauser = json.decode(response.body);
 
 if(datauser.length==0){
-  print("Verifica los daros");
-   
   setState(() {
     msg="Email o Contraseña Incorrectos";
     _status = false;
@@ -220,6 +220,7 @@ Widget headimg() {
     child: Image.network("https://umburoff.sirv.com/Images/img_311846.png"), //Imagen de internet
   );
 }
+
 
 
 Widget btnlogin(context) {

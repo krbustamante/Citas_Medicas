@@ -38,12 +38,9 @@ Future<List> _newUser() async {
     "rol": "paciente",
   });
   var datauser = json.decode(response.body);
- 
   setState(() {
-    msg="Cuenta creada!";
-    
-  });
-    
+    msg="Cuenta creada!"; 
+  });  
     setState(() {
     msg="Inicia Sesión";
     prefs.setString("email", email_txt.text);
@@ -64,15 +61,11 @@ Future<List> _verifyEmail() async {
     "email": email_txt.text,
   });
   var datauser = json.decode(response.body);
-
 if(datauser.length==0){
-    
-  print("No existe el correo");
   setState(() {
     msg="Creando cuenta...";
   });
   _newUser();
-  
 }else {
   if (datauser[0]['rol'] == 'paciente') { 
     setState(() {

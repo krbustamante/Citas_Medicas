@@ -1,10 +1,19 @@
 import 'dart:convert';
-import 'package:citas_medicas/main.dart'; 
-import 'package:flutter/material.dart';  
+import 'package:citas_medicas/main.dart';
+import 'package:citas_medicas/pages/historialpaciente.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+
+void main() {
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: newcita() ,
+    ),
+  );
+}
 
 class newcita extends StatefulWidget {
   @override
@@ -12,190 +21,291 @@ class newcita extends StatefulWidget {
 }
 
 class _newcitaState extends State<newcita> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    mostrar_datos();
+    _recuperarCitas();
+  }
 
-TextEditingController nombre_txt = new TextEditingController();
-TextEditingController apellido_txt = new TextEditingController();
-TextEditingController email_txt = new TextEditingController();
-TextEditingController edad_txt = new TextEditingController();
-TextEditingController direccion_txt = new  TextEditingController();
-TextEditingController pass_txt = new TextEditingController();
+  bool? load_logged = false;
+  String? load_email = '';
+  String? load_password = '';
+  String? load_nombre = '';
+  String? load_IDUsuario = '';
+  String? load_IDCita = '';
 
-String msg = '';
-String id = '';
-final _formkey = GlobalKey<FormState>();
- 
-Future<List> _newUser() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/adddata.php'), 
-  body: {
-    "nombre": nombre_txt.text,
-    "apellido": apellido_txt.text,
-    "email": email_txt.text,
-    "direccion": direccion_txt.text,
-    "password": pass_txt.text,
-    "edad": edad_txt.text, 
-    "rol": "paciente",
-  });
-  var datauser = json.decode(response.body);
- 
-  setState(() {
-    msg="Cuenta creada!";
-    
-  });
-    
+  Future<void> mostrar_datos() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     setState(() {
-    msg="Inicia Sesión";
-    prefs.setString("email", email_txt.text);
-    prefs.setString("password", pass_txt.text);
-    prefs.setString("nombre", nombre_txt.text); 
-    prefs.setString("apellido", apellido_txt.text);  
-    prefs.setString("edad", edad_txt.text);
-    prefs.setString("direccion", direccion_txt.text);    
-  });
+      load_logged = prefs.getBool("logged");
+      load_email = prefs.getString("email");
+      load_password = prefs.getString("password");
+      load_nombre = prefs.getString("nombre");
+      load_IDUsuario = prefs.getString("ID_Usuario");
+      load_IDCita = prefs.getString("ID_Cita");
+    });
+    print("ID usuario" + load_IDUsuario.toString());
+  }
 
-  Navigator.push(context,MaterialPageRoute(builder: (context)=>login()));
-  return datauser;
-}
-
-Future<List> _verifyEmail() async {
-  final response = await http.post(Uri.parse('http://krbustamante.byethost7.com/php/getemail.php'), 
-  body: {
-    "email": email_txt.text,
-  });
-  var datauser = json.decode(response.body);
-
-if(datauser.length==0){
-    
-  print("No existe el correo");
-  setState(() {
-    msg="Creando cuenta...";
-  });
-  _newUser();
+  var datauser;
   
-}else {
-  if (datauser[0]['rol'] == 'paciente') { 
+
+  Future<void> _recuperarCitas() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await http.post(
+        Uri.parse('http://krbustamante.byethost7.com/php/get_by_cita.php'),
+        body: {
+          "ID_Paciente": load_IDUsuario.toString(),
+        });
+
     setState(() {
-      msg="Este correo ya existe";
+      datauser = json.decode(response.body);
     });
   }
-}
-  return datauser;
-} 
 
-final _dateController = TextEditingController();
-final _timeController1 = TextEditingController();
+  String msg = '';
+  String id = '';
+  final _formkey = GlobalKey<FormState>();
 
-TextEditingController fecha = new TextEditingController();
-String textofecha = "Seleccionar Fecha";
+  Future<void> SaveData(fecha, hora, doctor, consultorio) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final response = await http.post(
+        Uri.parse('http://krbustamante.byethost7.com/php/addcita.php'),
+        body: {
+          "fecha": fecha,
+          "hora": hora,
+          "consultorio" : consultorio,
+          "doctor" : doctor,
+        });
+
+    setState(() {
+      msg = "Creando Cita Medica";
+    });
+ 
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const historial()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          leading: Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context)=>login()));
-                }, 
-              );
-            },
-          ),       
-          centerTitle: true,
-          title: Text("Registrate"),
-        ),
-        body: Container( //Creamos un contenedor
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          // ignore: sort_child_properties_last
-          child: Form( //centramos el contenido
-            key: _formkey,
-            child: ListView( //Creamos un contenedor que va poder hacer scroll
-              children: <Widget> [ //creamos una lista que pondra mas widgets uno tras otro
-                SizedBox(height: 50.0,),
-                Text("Selecciona una fecha y una hora para tu cita, tu doctor y tu consultorio los verás en tu historial.", style: TextStyle(color: Colors.black, fontSize: 16.0, fontWeight: FontWeight.w400),textAlign: TextAlign.center,),
-                SizedBox(height: 50.0,),
-                DateTimePicker(
-                  type: DateTimePickerType.dateTimeSeparate,
-                  dateMask: 'd MMM, yyyy',
-                  initialValue: DateTime.now().toString(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),                 
-                  dateLabelText: 'Fecha',
-                  timeLabelText: "Hora",
-                  decoration: InputDecoration(  
-                    fillColor: Colors.white,
-                    filled: true, 
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  selectableDayPredicate: (date) {
-                    // Disable weekend days to select from the calendar
-                    if (date.weekday == 6 || date.weekday == 7) {
-                      return false;
-                    }
-
-                    return true;
-                  },
-                  onChanged: (val) => print(val),
-                  validator: (val) {
-                    print(val);
-                    return null;
-                  },
-                  onSaved: (val) => print(val),
-                ),
-                SizedBox(height: 20.0,),
-                mensaje(),
-                SizedBox(height: 20.0,),
-                btncreatecita(),
-              ],
-            )
-          ),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(              
-              colors: [
-                Colors.cyan.shade200,
-                Colors.cyan.shade500,               
-              ],  
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,                    
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+            appBar: AppBar(
+              leading: Builder(
+                builder: (BuildContext context) {
+                  return IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const login()));
+                    },
+                  );
+                },
+              ),
+              centerTitle: true,
+              title: const Text("Crear nueva cita"),
             ),
-          ),        
-        ) 
-      )
+            body: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: Form(
+                  key: _formkey,
+                  child: ListView(
+                    children: <Widget>[
+                      const SizedBox(
+                        height: 50.0,
+                      ),
+                      const Text(
+                        "Selecciona una fecha y una hora para tu cita, tu doctor y tu consultorio los verás en tu historial.",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(
+                        height: 50.0,
+                      ),
+                      DateTimePicker(
+                        type: DateTimePickerType.dateTimeSeparate,
+                        dateMask: 'd MMM, yyyy',
+        
+                        initialValue: DateTime.now().toString(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                        dateLabelText: 'Fecha',
+                        timeLabelText: "Hora",
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                        ),
+                        selectableDayPredicate: (date) {
+                          // Disable weekend days to select from the calendar
+                          if (date.weekday == 6 || date.weekday == 7) {
+                            return false;
+                          }
+                          return true;
+                        },
+                        onChanged: (val) => SplitData(val),
+                        validator: (val) {
+                          SplitData(val.toString());
+                          return null;
+                        },
+                        onSaved: (val) => SplitData(val.toString()),
+                      ),
+                      const SizedBox(
+                        height: 20.0,
+                      ),
+                      menuDoctores(),
+                      const SizedBox(
+                        height: 20.0,
+                      ),
+                      menuConsultorios(),
+                      const SizedBox(
+                        height: 20.0,
+                      ),
+                      mensaje(),
+                      const SizedBox(
+                        height: 20.0,
+                      ),
+                      btncreatecita(),
+                    ],
+                  )),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.cyan.shade200,
+                    Colors.cyan.shade500,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            )));
+  }
+String hora = '', fecha = "";
+  SplitData(String data) {
+    final splitted = data.split(' ');
+    fecha = splitted[0];
+    hora = splitted[1];
+
+  }
+
+
+var consultorios = [
+  "Odontología",
+  "Ginecología",
+  "Pediatría",
+  "Podología",
+  "Consulta General"
+  ];
+
+String selectedConsultorio = '';
+
+  Widget menuConsultorios() {
+    return DropdownButton(
+               
+              // Initial Value
+              value: selectedConsultorio,
+               
+              // Down Arrow Icon
+              icon: const Icon(Icons.keyboard_arrow_down),   
+               
+              // Array list of items
+              items: consultorios.map((String items) {
+                return DropdownMenuItem(
+                  value: items,
+                  child: Text(items),
+                );
+              }).toList(),
+              // After selecting the desired option,it will
+              // change button value to selected value
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedConsultorio = newValue!;
+                });
+              },
+            );
+  }
+
+var doctores = [
+  "Jesus Marqués",
+  "Coral Lusia",
+  "Luis Gomez",
+  "Pacheco Flores",
+  ];
+
+String selectedDoctor = '';
+
+  Widget menuDoctores() {
+    return DropdownButton(
+      value: selectedDoctor,
+        
+      // Down Arrow Icon
+      icon: const Icon(Icons.keyboard_arrow_down),
+
+      style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.deepPurpleAccent,
+      ),
+      // Array list of items
+      items: consultorios.map((String items) {
+        return DropdownMenuItem(
+          value: items,
+          child: Text(items),
+        );
+      }).toList(),
+      // After selecting the desired option,it will
+      // change button value to selected value
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedDoctor = newValue!;
+        });
+      },
     );
   }
 
-Widget mensaje() { 
-  contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0);
-  return Text(msg,style: TextStyle(fontSize: 13.0,color: Colors.red),textAlign: TextAlign.center,);
-}
+  Widget mensaje() {
+    contentPadding:
+    const EdgeInsets.symmetric(horizontal: 0, vertical: 0);
+    return Text(
+      msg,
+      style: const TextStyle(fontSize: 13.0, color: Colors.red),
+      textAlign: TextAlign.center,
+    );
+  }
 
-Widget btncreatecita() {
-  return Container(
-    padding: EdgeInsets.symmetric(horizontal: 70, vertical: 5),
-    child: ElevatedButton( //Boton con estilos ya establecidos
-      onPressed: () {
-        if(_formkey.currentState!.validate()) {
-          final snackBar=SnackBar(content: Text('Iniciando Sesión'));
-          
-          setState(() {
-            msg="Verificando datos...";
-          }); 
-        }
-      }, //Evento del boton
-      child: Text('Crear cita'), //Texto del boton
-      style: ElevatedButton.styleFrom( //Definimos estilos
-        backgroundColor: Color.fromARGB(255, 0, 164, 65), //Color del boton
+  Widget btncreatecita() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 5),
+      child: ElevatedButton(
+        //Boton con estilos ya establecidos
+        onPressed: () {
+          if (_formkey.currentState!.validate()) {
+            setState(() {
+              msg = "Verificando datos...";
+            });
+            SaveData(fecha, hora, selectedConsultorio, selectedDoctor);
+          }
+        }, //Evento del boton
+        child: const Text('Crear cita'), //Texto del boton
+        style: ElevatedButton.styleFrom(
+          //Definimos estilos
+          backgroundColor:
+              const Color.fromARGB(255, 0, 164, 65), //Color del boton
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
-
-
-}
-
