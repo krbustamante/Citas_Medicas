@@ -7,14 +7,6 @@ import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: newcita() ,
-    ),
-  );
-}
-
 class newcita extends StatefulWidget {
   @override
   State<newcita> createState() => _newcitaState();
